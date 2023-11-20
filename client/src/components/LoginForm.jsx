@@ -7,10 +7,11 @@ import { LOGIN_USER } from '../utils/mutations';
 
 import Auth from '../utils/auth';
 
-const [login, { error }] = useMutation(LOGIN_USER);
 
 
 const LoginForm = () => {
+  const [login, { error }] = useMutation(LOGIN_USER);
+
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
