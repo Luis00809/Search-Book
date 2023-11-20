@@ -15,7 +15,10 @@ import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import { SAVE_BOOK } from '../utils/mutations';
 
+
 const SearchBooks = () => {
+  const [saveBook, {error}] = useMutation(SAVE_BOOK)
+
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
@@ -30,9 +33,11 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   });
 
+
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+
 
     if (!searchInput) {
       return false;
@@ -62,28 +67,46 @@ const SearchBooks = () => {
     }
   };
 
+  if (error) {
+    console.error('Mutation ErrorHere error', error)
+  }
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+    console.log(bookToSave.bookId);
+    console.log(bookToSave.authors);
+    console.log(bookToSave.title);
+    console.log(bookToSave.description);
+    console.log(bookToSave.image);
 
-    const [saveBook, { error }] = useMutation(SAVE_BOOK)
 
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+    
     if (!token) {
       return false;
     }
 
+    console.log(Auth.getProfile().data._id);
     try {
+      
       // const response = await saveBook(bookToSave, token);
-      const { response } = await saveBook({
+      const { data } = await saveBook({
         variables: {
-          data
+          userId: Auth.getProfile().data._id,
+          book: {
+            _id: Auth.getProfile().data._id,
+            bookId: bookToSave.bookId,
+            authors: bookToSave.authors,
+            title: bookToSave.title,
+            description: bookToSave.description,
+            image: bookToSave.image,
+            link: bookToSave.link
+          }
         },
       })
-      if (!response.ok) {
+      if (!data) {
         throw new Error('something went wrong!');
       }
 
