@@ -6,12 +6,11 @@ const resolvers = {
 
         me: async (parent, args, context) => {
             if (context.user) {
-             return User.findOne({ _id: context.user._id }).select('-__v -password');
-      
+              return User.findOne({ _id: context.user.data._id });
             }
-      
+            throw AuthenticationError;
+            console.log(AuthenticationError);
           },
-
 
     },
     Mutation: {
@@ -39,16 +38,17 @@ const resolvers = {
         },
         saveBook: async (parent, { userId, book }) => {
             console.log(book)
-            return User.findOneAndUpdate(
+            const userUpdate = await User.findOneAndUpdate(
                 {_id: userId},
                 {
-                    $addToSet: { savedBooks: book }
+                    $push: { savedBooks: book }
                 },
                 {
                     new: true,
                     runValidators: true,
                 }
             );
+            return userUpdate
         },
         deleteBook: async (parent, { userId, bookId }) => {
             return User.findOneAndUpdate(
