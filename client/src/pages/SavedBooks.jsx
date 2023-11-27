@@ -16,22 +16,22 @@ import { removeBookId } from '../utils/localStorage';
 
 
 const SavedBooks = () => {
-  
-  const { loading, data, error } = useQuery(GET_ME, {
+  const loggedIn =  Auth.loggedIn() && Auth.getProfile().data._id
+  console.log(loggedIn);
+  const { loading, data: meData, error } = useQuery(GET_ME,
+    {
     context: {
       user: {
-        _id:  Auth.getProfile().data._id 
+        _id: loggedIn
       }
     }
-  });
-
-  
-
-  console.log(Auth.getProfile() );
-  console.log(data);
-  const userData = data;
-  console.log(userData);
-
+  }
+  );
+  console.log(error);
+  console.log( meData);
+  const userData = meData?.me || "nada";
+  // console.log(userData);
+console.log( Auth.getProfile().data._id);
 
   const [removeBook] = useMutation(REMOVE_BOOK);
 
@@ -61,6 +61,7 @@ const SavedBooks = () => {
   if (loading) {
     return <h2>LOADING...</h2>;
   }
+
 
   return (
     <>
